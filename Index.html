@@ -1,182 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2D Car Game</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: linear-gradient(to bottom, #2193b0, #6dd5ed);
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      display: block;
-      background: #7f8c8d;
-      border: 2px solid #2c3e50;
-      margin: 20px auto;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      height: auto;
-    }
-    #playAgain {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 10px 20px;
-      font-size: 20px;
-      background: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #playAgain:hover {
-      background: #c0392b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Car Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #2193b0, #6dd5ed);
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            background: #7f8c8d;
+            border: 2px solid #2c3e50;
+            margin: 20px auto;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+
+        #playAgain {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            font-size: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #playAgain:hover {
+            background: #c0392b;
+        }
+    </style>
 </head>
+
 <body>
-  <canvas id="gameCanvas"></canvas>
-  <button id="playAgain">Play Again</button>
+    <canvas id="gameCanvas"></canvas>
+    <button id="playAgain">Play Again</button>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const playAgainButton = document.getElementById("playAgain");
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const playAgainButton = document.getElementById("playAgain");
 
-    canvas.width = Math.min(400, window.innerWidth - 20);
-    canvas.height = Math.min(600, window.innerHeight - 100);
+        canvas.width = Math.min(400, window.innerWidth - 20);
+        canvas.height = Math.min(600, window.innerHeight - 100);
 
-    // Load car image
-    const carImage = new Image();
-    carImage.src = "/png-transparent-car-game-racing.png"; // Example car image URL
+        // Load car image
+        const carImage = new Image();
+        carImage.src = "/png-transparent-car-game-racing.png"; // Example car image URL
 
-    const car = {
-      x: canvas.width / 2 - 25,
-      y: canvas.height - 120,
-      width: 50,
-      height: 100,
-      speed: 5
-    };
+        const car = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 120,
+            width: 50,
+            height: 100,
+            speed: 15
+        };
 
-    // Obstacle properties
-    const obstacles = [];
-    const obstacleWidth = 50;
-    const obstacleHeight = 20;
+        // Obstacle properties
+        const obstacles = [];
+        const obstacleWidth = 50;
+        const obstacleHeight = 20;
 
-    let gameOver = false;
-    let score = 0;
-    let speedMultiplier = 1;
+        let gameOver = false;
+        let score = 0;
+        let speedMultiplier = 1;
 
-    // Create obstacles
-    function createObstacle() {
-      const x = Math.random() * (canvas.width - obstacleWidth);
-      obstacles.push({ x, y: 0, width: obstacleWidth, height: obstacleHeight, color: "black" });
-    }
-
-    setInterval(createObstacle, 1500);
-
-    // Move car with keyboard
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft" && car.x > 0) {
-        car.x -= car.speed;
-      } else if (e.key === "ArrowRight" && car.x < canvas.width - car.width) {
-        car.x += car.speed;
-      }
-    });
-
-    // Move car with touch
-    canvas.addEventListener("touchstart", (e) => {
-      const touchX = e.touches[0].clientX;
-      if (touchX < canvas.width / 2 && car.x > 0) {
-        car.x -= car.speed;
-      } else if (touchX >= canvas.width / 2 && car.x < canvas.width - car.width) {
-        car.x += car.speed;
-      }
-    });
-
-    // Update obstacles
-    function updateObstacles() {
-      obstacles.forEach((obstacle, index) => {
-        obstacle.y += 3 * speedMultiplier;
-
-        // Check collision
-        if (
-          car.x < obstacle.x + obstacle.width &&
-          car.x + car.width > obstacle.x &&
-          car.y < obstacle.y + obstacle.height &&
-          car.y + car.height > obstacle.y
-        ) {
-          gameOver = true;
+        // Create obstacles
+        function createObstacle() {
+            const x = Math.random() * (canvas.width - obstacleWidth);
+            obstacles.push({ x, y: 0, width: obstacleWidth, height: obstacleHeight, color: "black" });
         }
 
-        // Remove obstacle if it goes off screen
-        if (obstacle.y > canvas.height) {
-          obstacles.splice(index, 1);
-          score += 10;
-          if (score % 50 === 0) {
-            speedMultiplier += 0.2; // Increase difficulty
-          }
+        setInterval(createObstacle, 1500);
+
+        // Move car with keyboard
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft" && car.x > 0) {
+                car.x -= car.speed;
+            } else if (e.key === "ArrowRight" && car.x < canvas.width - car.width) {
+                car.x += car.speed;
+            }
+        });
+
+        // Touch controls for mobile
+        canvas.addEventListener("touchstart", (e) => {
+            const touchX = e.touches[0].clientX;
+
+            if (touchX < canvas.width / 2 && car.x > 0) {
+                car.x -= car.speed;
+            } else if (touchX > canvas.width / 2 && car.x < canvas.width - car.width) {
+                car.x += car.speed;
+            }
+        });
+
+        // Update obstacles
+        function updateObstacles() {
+            obstacles.forEach((obstacle, index) => {
+                obstacle.y += 3 * speedMultiplier;
+
+                // Check collision
+                if (
+                    car.x < obstacle.x + obstacle.width &&
+                    car.x + car.width > obstacle.x &&
+                    car.y < obstacle.y + obstacle.height &&
+                    car.y + car.height > obstacle.y
+                ) {
+                    gameOver = true;
+                }
+
+                // Remove obstacle if it goes off screen
+                if (obstacle.y > canvas.height) {
+                    obstacles.splice(index, 1);
+                    score += 10;
+                    if (score % 50 === 0) {
+                        speedMultiplier += 0.2; // Increase difficulty
+                    }
+                }
+            });
         }
-      });
-    }
 
-    // Draw car
-    function drawCar() {
-      ctx.drawImage(carImage, car.x, car.y, car.width, car.height);
-    }
+        // Draw car
+        function drawCar() {
+            ctx.drawImage(carImage, car.x, car.y, car.width, car.height);
+        }
 
-    // Draw obstacles
-    function drawObstacles() {
-      obstacles.forEach((obstacle) => {
-        ctx.fillStyle = obstacle.color;
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      });
-    }
+        // Draw obstacles
+        function drawObstacles() {
+            obstacles.forEach((obstacle) => {
+                ctx.fillStyle = obstacle.color;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
 
-    // Draw score
-    function drawScore() {
-      ctx.fillStyle = "white";
-      ctx.font = "20px Arial";
-      ctx.fillText(`Score: ${score}`, 10, 30);
-    }
+        // Draw score
+        function drawScore() {
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
 
-    // Game loop
-    function gameLoop() {
-      if (gameOver) {
-        ctx.fillStyle = "black";
-        ctx.font = "30px Arial";
-        ctx.fillText("Game Over !", canvas.width / 2 - 75, canvas.height / 2 - 20);
-        playAgainButton.style.display = "block";
-        return;
-      }
+        // Game loop
+        function gameLoop() {
+            if (gameOver) {
+                ctx.fillStyle = "black";
+                ctx.font = "30px Arial";
+                ctx.fillText("Game Over !", canvas.width / 2 - 75, canvas.height / 2 - 20);
+                playAgainButton.style.display = "block";
+                return;
+            }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      drawCar();
-      drawObstacles();
-      updateObstacles();
-      drawScore();
+            drawCar();
+            drawObstacles();
+            updateObstacles();
+            drawScore();
 
-      requestAnimationFrame(gameLoop);
-    }
+            requestAnimationFrame(gameLoop);
+        }
 
-    playAgainButton.addEventListener("click", () => {
-      gameOver = false;
-      obstacles.length = 0;
-      car.x = canvas.width / 2 - 25;
-      score = 0;
-      speedMultiplier = 1;
-      playAgainButton.style.display = "none";
-      gameLoop();
-    });
+        playAgainButton.addEventListener("click", () => {
+            gameOver = false;
+            obstacles.length = 0;
+            car.x = canvas.width / 2 - 25;
+            score = 0;
+            speedMultiplier = 1;
+            playAgainButton.style.display = "none";
+            gameLoop();
+        });
 
-    gameLoop();
-  </script>
+        gameLoop();
+    </script>
 </body>
+
 </html>
